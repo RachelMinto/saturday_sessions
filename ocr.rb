@@ -2,7 +2,7 @@
 require 'pry'
 
 class OCR
-  attr_accessor :text, :numbers_count
+  attr_accessor :text, :lines
   NUMBERS = {'0' => " _ | ||_|", '1' => "  |  |",
              '2' => " _  _||_ ", '3' => " _  _| _|",
              '4' => "|_|  |", '5' => " _ |_  _|",
@@ -11,59 +11,41 @@ class OCR
 
   def initialize(text)
     @text = text
-    text.gsub!("_\n",'_ ')
-    self.text.delete!("\n") if text.include?("\n")
-    @numbers_count = text.length > 9 ? text.length / 9.0 : 1.0
+    @lines = text.scan("\n\n").count + 1
+    # @numbers_per_line = ((text.slice(0, text.index("\n\n")).length - 1) / 9) if lines > 1
   end
 
   def convert
-    return '?' if self.text.length % 3 != 0
-    number_code = find_num_array(text)
-    number = ''
-    p number_code
-    number_code.each do |code|
-      number += NUMBERS.has_value?(code) ? NUMBERS.key(code) : "?"
-      number[-1] = '1' if code == "     |  |"
-      number[-1] = '4' if code == "   |_|  |"
+    array_of_numbers = []
+    paragraph_to_rows_of_nums.each do |rows|
+      rows_to_individual_numbers(rows_of_nums_to_lines(rows))
     end
-    number
   end
 
-  def find_num_array(text)
-    num_array = make_num_array
-    sections_of_letter = 0
-    letter_index = 0
-    text.split('').each do | character |
-      if sections_of_letter == 3
-        sections_of_letter = 0
-        letter_index += 1
+  def paragraph_to_rows_of_nums
+    text.split("\n\n")
+  end
+
+  def rows_of_nums_to_lines(rows)
+    rows.split("\n")
+  end
+
+  def rows_to_individual_numbers(rows)
+    numbers = []
+    numbers_per_line = (rows.first.length / 3.0).ceil
+    p numbers_per_line
+    numbers_per_line.times |time|
+      number = ''
+      start = 0
+      size_grouping = time == 3 ?  : 3
+      rows.each do |row|
+        number << row[start, size_grouping]
       end
-      if letter_index == self.numbers_count
-        letter_index = 0
-      end
-      num_array[letter_index] << character
-      sections_of_letter += 1
+      start += 3
     end
-    join_letter_codes(num_array)
-  end
-
-  private
-
-  def make_num_array
-    array = []
-    numbers_count.to_i.times { |num| array.push([]) }
-    array
-  end
-
-  def join_letter_codes(num_array)
-    num_code_array = []
-    num_array.each do |num_code|
-      num_code_array << num_code.join('')
-    end
-    num_code_array
+    numbers
   end
 end
-
 text = <<-NUMBER.chomp
     _  _
   | _| _|
