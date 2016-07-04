@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/reporters'
-require_relative '06-04-16.rb'
+require_relative 'house.rb'
 
 Minitest::Reporters.use!
 

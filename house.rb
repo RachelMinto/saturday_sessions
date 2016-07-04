@@ -1,16 +1,14 @@
 
 class House
-
   def self.recite
-    rhyme = ''
     previous = pieces.last[0] + ".\n"
-    rhyme << "This is " + previous
+    rhyme = 'This is ' + previous
 
     counter = pieces.length - 2
-    while counter > 0
-      rhyme << "\nThis is " + pieces[counter][0] + ' '
-      rhyme << "\n" + pieces[counter][1] + ' ' + previous
-      previous = pieces[counter][0] + "\n" + pieces[counter][1] + ' ' + previous
+    while counter >= 0
+      body = pieces[counter][0] + "\n" + pieces[counter][1] + ' ' + previous
+      rhyme << "\nThis is " + body
+      previous = body
       counter -= 1
     end
     rhyme
@@ -18,6 +16,7 @@ class House
 
   private
 
+  # rubocop:disable Metrics/MethodLength
   def self.pieces
     [
       ['the horse and the hound and the horn', 'that belonged to'],
@@ -35,5 +34,3 @@ class House
     ]
   end
 end
-
-puts House.recite
