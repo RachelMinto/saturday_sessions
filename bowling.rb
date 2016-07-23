@@ -20,7 +20,7 @@ class Game
   end
 
   def next_frame?
-    if @current_frame != 9
+    if @current_frame != 9 || (@current_frame == 9 && !fill_ball?)
       frame.count == 2 || frame.reduce(:+) == 10
     end
   end
